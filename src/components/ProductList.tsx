@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Product, Category } from '../lib/supabase';
-import { supabase } from '../lib/supabase';
-import { productDB } from '../lib/db';
-import { PlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Product, Category } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
+import { productDB } from "../lib/db";
+import { PlusIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [lastFetched, setLastFetched] = useState<number | null>(null);
 
@@ -18,12 +18,12 @@ export default function ProductList() {
       console.log("navigator.onLine", navigator.onLine);
     };
 
-    window.addEventListener('online', handleOnlineStatus);
-    window.addEventListener('offline', handleOnlineStatus);
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
 
     return () => {
-      window.removeEventListener('online', handleOnlineStatus);
-      window.removeEventListener('offline', handleOnlineStatus);
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
     };
   }, []);
 
@@ -39,36 +39,9 @@ export default function ProductList() {
 
   const loadProducts = async () => {
     const currentTime = Date.now();
-    if (lastFetched && currentTime - lastFetched < 5 * 60 * 1000) {
-      // If data was fetched within the last 5 minutes, use LocalStorage
-      const offlineProducts = productDB.getAllProducts();
-      setProducts(offlineProducts);
-      return;
-    }
-
-    if (isOnline) {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading products:', error);
-        const offlineProducts = productDB.getAllProducts();
-        setProducts(offlineProducts);
-      } else if (data) {
-        setProducts(data);
-        // Update LocalStorage with latest data
-        productDB.clearLocalStorage(); // Clear old data
-        data.forEach((product) => {
-          productDB.addProduct(product);
-        });
-        setLastFetched(currentTime); // Update last fetched time
-      }
-    } else {
-      const offlineProducts = productDB.getAllProducts();
-      setProducts(offlineProducts);
-    }
+    console.log("currentTime",currentTime)
+    const offlineProducts = productDB.getAllProducts();
+    setProducts(offlineProducts);
   };
 
   const handleRefetch = async () => {
@@ -78,16 +51,19 @@ export default function ProductList() {
 
       // Fetch fresh data from Supabase
       const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       const { data: categoriesData, error: categoriesError } = await supabase
-        .from('category')
-        .select('*');
+        .from("category")
+        .select("*");
 
       if (productsError || categoriesError) {
-        console.error('Error refetching data:', productsError || categoriesError);
+        console.error(
+          "Error refetching data:",
+          productsError || categoriesError
+        );
         return;
       }
 
@@ -117,7 +93,9 @@ export default function ProductList() {
 
       setLastFetched(Date.now());
     } else {
-      alert('You are offline. Refetching data requires an internet connection.');
+      alert(
+        "You are offline. Refetching data requires an internet connection."
+      );
     }
   };
 
@@ -125,15 +103,17 @@ export default function ProductList() {
     const grouped = new Map<string, Product[]>();
 
     // Get unique categories from products
-    const uniqueCategories = [...new Set(products.map(product => product.category))];
+    const uniqueCategories = [
+      ...new Set(products.map((product) => product.category)),
+    ];
 
     // Initialize groups for all categories
-    uniqueCategories.forEach(category => {
+    uniqueCategories.forEach((category) => {
       grouped.set(category, []);
     });
 
     // Group products
-    products.forEach(product => {
+    products.forEach((product) => {
       const categoryProducts = grouped.get(product.category) || [];
       categoryProducts.push(product);
       grouped.set(product.category, categoryProducts);
@@ -145,7 +125,7 @@ export default function ProductList() {
   const productsByCategory = groupProductsByCategory();
 
   // Filter categories based on search query
-  const filteredCategories = categories.filter(category =>
+  const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -173,8 +153,9 @@ export default function ProductList() {
         </div>
       ) : (
         <div className="space-y-8">
-          {filteredCategories.map(category => {
-            const categoryProducts = productsByCategory.get(category.name) || [];
+          {filteredCategories.map((category) => {
+            const categoryProducts =
+              productsByCategory.get(category.name) || [];
 
             return (
               <div key={category.id} className="bg-sharon-paper rounded-lg p-6">
@@ -189,7 +170,10 @@ export default function ProductList() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {categoryProducts.map((product) => (
-                      <div key={product.id} className="bg-sharon-dark rounded-lg shadow-lg overflow-hidden">
+                      <div
+                        key={product.id}
+                        className="bg-sharon-dark rounded-lg shadow-lg overflow-hidden"
+                      >
                         <img
                           src={product.image_url}
                           alt={product.name}
