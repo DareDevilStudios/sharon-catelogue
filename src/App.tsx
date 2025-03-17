@@ -10,8 +10,10 @@ function App() {
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
+        console.log("window loaded")
         navigator.serviceWorker.register('/sw.js').then(
           (registration) => {
+            console.log("registration",registration)
             console.log('ServiceWorker registration successful');
           },
           (err) => {
