@@ -178,7 +178,7 @@ export default function CreateProduct() {
         // Delete old image if it exists
         if (editingProduct?.image_url) {
           const oldFileName = editingProduct.image_url.split("/").pop();
-          await supabase.storage.from("products").remove([`products/${fileName}`]);
+          await supabase.storage.from("products").remove([`products/${oldFileName}`]);
         }
       }
 
