@@ -10,7 +10,6 @@ export default function ProductList() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [lastFetched, setLastFetched] = useState<number | null>(null);
 
   useEffect(() => {
     const handleOnlineStatus = () => {
@@ -90,8 +89,6 @@ export default function ProductList() {
           }
         });
       }
-
-      setLastFetched(Date.now());
     } else {
       alert(
         "You are offline. Refetching data requires an internet connection."
